@@ -35,7 +35,7 @@
                         <div class="row mb-md-3">
                             <label for="myItem" class="col-md-3 col-form-label">時間</label>
                             <div class="col-md-9">
-                                <input type="text" class="form-control" id="myTime" disabled>
+                                <input type="text" class="form-control" id="myTime" disabled><!--無法修改時間-->
                             </div>
                         </div>
                         <div class="row mb-md-3">
@@ -72,32 +72,31 @@
 </body>
 <script>
     $(function(){
-        const key = JSON.parse(localStorage.getItem('key'));
-        var db = openDatabase('mydatabase','1.0','cash_record',2*1024*1024);
+        const key = JSON.parse(localStorage.getItem('key'));//取得key(全域)
+        var db = openDatabase('mydatabase','1.0','cash_record',2*1024*1024);//打開webSQL資料庫
         db.transaction(function(record){
             record.executeSql(
-                'SELECT * FROM cash_record WHERE time=?',[key],function(record,result){
-                    var len = result.rows.length;
-                    for (i = 0; i < len; i++) {
-                        $('#myTime').val(result.rows.item(i).time);
-                        $('#myItem').val(result.rows.item(i).item);
-                        $('#myCost').val(result.rows.item(i).cost);
-                        $('#myContent').val(result.rows.item(i).content);
-                    }                   
+                'SELECT * FROM cash_record WHERE time=?',[key],function(record,result){//利用time = key 調出該筆資料
+                    $('#myTime').val(result.rows.item(0).time);
+                    $('#myItem').val(result.rows.item(0).item);
+                    $('#myCost').val(result.rows.item(0).cost);
+                    $('#myContent').val(result.rows.item(0).content);
                 }
             );
         });
         $('#submit').click(function(){
             var db = openDatabase('mydatabase','1.0','cash_record',2*1024*1024);
             db.transaction(function(record){
-                record.executeSql('DELETE FROM cash_record WHERE time = ?',[key]);
+                record.executeSql('DELETE FROM cash_record WHERE time = ?',[key]);//刪除該筆資料
             });
             localStorage.removeItem('key');
             alert('刪除成功!');
-            window.location.href = 'record.html';
+            window.location.href = 'record.html';//導回紀錄頁面
+            //離開頁面移除key
         });
         $('#reset').click(function(){
             localStorage.removeItem('key');
+            //離開頁面移除key
         });
     });
 </script>

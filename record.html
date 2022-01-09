@@ -42,7 +42,7 @@
         </div>  
         
         <div class="row">
-            <table class="table table-striped" id="myTable">
+            <table class="table table-striped">
                 <thead>
                     <tr>
                         <th>日期</th>
@@ -56,7 +56,7 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td id="total"></td>
+                        <td id="total"></td><!--用來存放總金額-->
                     </tr>                   
                 </tfoot>
             </table>
@@ -65,27 +65,28 @@
 </body>
 <script>
     $(function(){
-        var db = openDatabase('mydatabase','1.0','cash_record',2*1024*1024);
-        var total = 0;
+        var db = openDatabase('mydatabase','1.0','cash_record',2*1024*1024);//打開webSQL資料庫
+        var total = 0;//總金額初始值為0
         db.transaction(function(record){
             record.executeSql(
-                'SELECT * FROM cash_record',[],function(record,result){
+                'SELECT * FROM cash_record',[],function(record,result){//查詢資料(全部)
                     var len = result.rows.length;
-                    for (i = 0; i < len; i++) {
+                    for (i = 0; i < len; i++) {//每有一筆資料，就新增一列(row)到<tbody>下，最晚的最上面
                         $('tbody').prepend("<tr><td class='key'>"+result.rows.item(i).time+"</td><td>"+result.rows.item(i).item+"</td><td>"+result.rows.item(i).cost+"</td><td>"+result.rows.item(i).content+"</td><td><button class='btn btn-warning replace_btn py-0 px-1 me-3'>修改</button><button class='btn btn-secondary delete_btn py-0 px-1'>刪除</button></td></tr>");
-                        total = total + parseInt(result.rows.item(i).cost);
+                        
+                        total = total + parseInt(result.rows.item(i).cost);//累計總金額
                     }
                     $('.delete_btn').click(function(){
-                        let key = $(this).closest('tr').find('.key').html();
-                        localStorage.setItem('key',JSON.stringify(key));
-                        window.location.href = 'delete.html';
+                        let key = $(this).closest('tr').find('.key').html();//找到觸發事件的該按鈕所在列<tr>(找父節點)，再從<tr>找class為key的子節點，找到時間(唯一)作為key
+                        localStorage.setItem('key',JSON.stringify(key));//利用localStorage存放該筆資料的時間(key)
+                        window.location.href = 'delete.html';//進入刪除頁面
                     });
                     $('.replace_btn').click(function(){
                         let key = $(this).closest('tr').find('.key').html();
                         localStorage.setItem('key',JSON.stringify(key));
-                        window.location.href = 'replace.html';
+                        window.location.href = 'replace.html';//進入修改頁面
                     });
-                    $('#total').html("總花費 : " + total + "元");
+                    $('#total').html("總花費 : " + total + "元");//寫入總金額
                 }
             );
         });

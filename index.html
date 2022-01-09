@@ -71,49 +71,52 @@
 </body>
 <script>
     $(function(){
-        const record = JSON.parse(localStorage.getItem('record')); 
-        if (record != null) { 
-            if (!!record.item) {
-                $('#myItem').val(record.item); 
+        //即時保存輸入資料save，必免頁面重新整理導致資料刷新
+        const save = JSON.parse(localStorage.getItem('save')); 
+        if (save != null) { 
+            if (!!save.item) {
+                $('#myItem').val(save.item); 
             } 
-            if (!!record.cost) {
-                $('#myCost').val(record.cost); 
+            if (!!save.cost) {
+                $('#myCost').val(save.cost); 
             }
-            if (!!record.content) {
-                $('#myContent').val(record.content); 
+            if (!!save.content) {
+                $('#myContent').val(save.content); 
             }  
-        } 
+        }
         $('#myItem,#myCost,#myContent').keyup(function () { 
-            let record = { 
+            let save = { 
                 'item': $('#myItem').val(), 
                 'cost': $('#myCost').val(), 
                 'content': $('#myContent').val()
             }; 
-            localStorage.setItem('record',JSON.stringify(record));
+            localStorage.setItem('save',JSON.stringify(save));
         });
         $('#reset').click(function(){
-            localStorage.removeItem('record');
+            localStorage.removeItem('save');
         });
+        //按下submit將資料上傳到webSQL
         $('#submit').click(function(){
             var today = new Date();
             var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
             var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-
+            //取得當下時間(年/月/日 + 時/分/秒)
             var dateTime = date+' '+time;
 
             var item = $('#myItem').val();
             var cost = $('#myCost').val();
             var content = $('#myContent').val();
 
-            var db = openDatabase('mydatabase','1.0','cash_record',2*1024*1024);
+            var db = openDatabase('mydatabase','1.0','cash_record',2*1024*1024);//打開webSQL資料庫，若無則建立一個新的名叫mydatabase的資料庫，cash_record為描述資料庫
             db.transaction(function(record){
-                record.executeSql('CREATE TABLE IF NOT EXISTS cash_record (time, item, cost, content)');
-                record.executeSql('INSERT INTO cash_record (time, item, cost, content) VALUES (?, ?, ?, ?)',[dateTime, item, cost, content]);
+                record.executeSql('CREATE TABLE IF NOT EXISTS cash_record (time, item, cost, content)');//若無則建立一個名為cash_record的table
+                record.executeSql('INSERT INTO cash_record (time, item, cost, content) VALUES (?, ?, ?, ?)',[dateTime, item, cost, content]);//新增資料
             });
             alert('新增成功!!');
             location.reload();
-            localStorage.removeItem('record');
-            return false;
+            localStorage.removeItem('save');
+            //重新整理頁面並移除save
+            return false;//不用真的提交表單
         });
     });    
 </script>

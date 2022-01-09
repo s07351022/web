@@ -72,19 +72,16 @@
 </body>
 <script>
     $(function(){
-        const key = JSON.parse(localStorage.getItem('key'));
-        var db = openDatabase('mydatabase','1.0','cash_record',2*1024*1024);
+        const key = JSON.parse(localStorage.getItem('key'));//取得key(全域)
+        var db = openDatabase('mydatabase','1.0','cash_record',2*1024*1024);//打開webSQL資料庫
         db.transaction(function(record){
             record.executeSql(
-                'SELECT * FROM cash_record WHERE time=?',[key],function(record,result){
-                    var len = result.rows.length;
-                    for (i = 0; i < len; i++) {
-                        $('#myTime').val(result.rows.item(i).time);
-                        $('#myItem').val(result.rows.item(i).item);
-                        $('#myCost').val(result.rows.item(i).cost);
-                        $('#myContent').val(result.rows.item(i).content);
-                    }
-                    const save = JSON.parse(localStorage.getItem('save')); 
+                'SELECT * FROM cash_record WHERE time=?',[key],function(record,result){//利用time = key 調出該筆資料
+                    $('#myTime').val(result.rows.item(0).time);
+                    $('#myItem').val(result.rows.item(0).item);
+                    $('#myCost').val(result.rows.item(0).cost);
+                    $('#myContent').val(result.rows.item(0).content);
+                    const save = JSON.parse(localStorage.getItem('save'));//即時保存輸入資料save，必免頁面重新整理導致資料刷新
                     if (save != null) { 
                         if (!!save.item) {
                             $('#myItem').val(save.item); 
@@ -113,16 +110,18 @@
             var content = $('#myContent').val();
             var db = openDatabase('mydatabase','1.0','cash_record',2*1024*1024);
             db.transaction(function(record){
-                record.executeSql('UPDATE cash_record SET item=?, cost=?, content=? WHERE time = ?',[item, cost, content,key]);
+                record.executeSql('UPDATE cash_record SET item=?, cost=?, content=? WHERE time = ?',[item, cost, content,key]);//將修改後的資料丟回資料庫
             });
             alert('修改成功!');
             localStorage.removeItem('save');
             localStorage.removeItem('key');
-            window.location.href = 'record.html';
+            //離開頁面移除key、save
+            window.location.href = 'record.html';//導回紀錄頁面
         });
         $('#reset').click(function(){
             localStorage.removeItem('key');
             localStorage.removeItem('save');
+            //離開頁面移除key、save
         });
     });
 </script>
