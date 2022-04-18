@@ -63,11 +63,11 @@
 							</div>
 							<div class="row">
 								<div class="col">
-									<button type="submit" class="btn btn-reg w-100 btn-primary">新增</button>
+									<button type="submit" class="btn btn-primary w-100 btn-reg">新增</button>
 								</div>
 								<div class="col-6">
-                                    <button type="reset" class="btn btn-secondary w-100 " id="reset">清除</button>
-                                </div> 
+                                    <button type="reset" class="btn btn-secondary w-100" id="reset">清除</button>
+                                </div>
 							</div>							
 						</form>
 					</div>
@@ -124,7 +124,8 @@
 					dataType: 'html'
 					}).done(function (data){				
 						if(data == "yes"){
-							alert("新增成功");				
+							alert("新增成功");	
+							location.reload();			
 						}
 						else{
 							alert("新增失敗,請確認電腦連線狀態")

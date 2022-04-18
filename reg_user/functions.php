@@ -1,8 +1,8 @@
 <?php
+require_once 'dbtools.inc.php';
 function register_user($userid, $userpw){
-    require_once 'dbtools.inc.php';
     $userpw = md5($userpw);
-    $result = null;
+    $result = false;
     $sql = "INSERT INTO `user` (`user_ID`, `user_PW`)
             VALUE ('{$userid}', '{$userpw}')";
 
@@ -18,11 +18,10 @@ function register_user($userid, $userpw){
 }
 
 function id_repeat($userid){
-    require_once 'dbtools.inc.php';
-    $result = null;
+    $result = false;
     $sql = "SELECT * 
             FROM  `user` 
-            WHERE `user_ID` = '{$userid}'";
+            WHERE BINARY `user_ID` = '{$userid}'";
 
     $link = create_connection();
     $query = execute_sql($link,"blog",$sql);
